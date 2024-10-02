@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from src.chatbot import PsychologistChatbot  # Importar la clase desde chatbot.py
+from chatbot import PsychologistChatbot  # Importar la clase desde chatbot.py
 
 # Crear una instancia de FastAPI
 app = FastAPI()

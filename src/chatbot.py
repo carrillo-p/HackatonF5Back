@@ -45,6 +45,12 @@ class PsychologistChatbot():
 
         self.psychologist_chain = RunnableSequence(self.prompt | self.llm)
 
-        def get_response(self, user_input: str) -> str:
+    def get_response(self, user_input: str) -> str:
+        try:
             response = self.psychologist_chain.invoke({"input": user_input})
-            return response['output']
+            if isinstance(response, str):
+                return response
+            else:
+                return "Error: Respuesta inesperada del modelo."
+        except Exception as e:
+            return f"Error: {str(e)}"
