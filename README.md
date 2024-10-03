@@ -1,4 +1,6 @@
 # HackatonF5Back
+Repo del front: https://github.com/LorelizDev/hackaton-F5-G1-2024
+
 Repo del backend del hackaton
 
 Estructua del .env para trabajar en local con Docker:
