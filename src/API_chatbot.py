@@ -1,12 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from chatbot import PsychologistChatbot  # Añadir src. si se van a ejecutar los tests
+from src.chatbot import PsychologistChatbot  # Añadir src. si se van a ejecutar los tests
 
 # Crear una instancia de FastAPI
 app = FastAPI()
 
 # Crear una instancia del chatbot psicólogo
-pdf_paths = ["resources/dsm-5.pdf", "resources/relajacion.pdf"]
+pdf_paths = ["src/resources/dsm-5.pdf", "src/resources/relajacion.pdf"] # añadir /src si se van a ejecutar los tests
 web_urls = ["https://www.psychologytoday.com/us/basics/depression"]
 chatbot = PsychologistChatbot(pdf_paths=pdf_paths)
 
