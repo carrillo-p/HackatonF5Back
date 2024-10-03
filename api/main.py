@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from datetime import timedelta
 import crud, models, schemas, auth
 from database import engine, get_db
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from src.chatbot import PsychologistChatbot 
+from auth import create_access_token, authenticate_user, get_current_user
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -35,13 +35,21 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=user)
 
-# Login para obtener acceso (POST /login/)
-@app.post("/login/")
-async def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
-    usuario = crud.verificar_usuario(db, user.username, user.password)
-    if not usuario:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
-    return {"success": True, "user_id": usuario.id}
+# Login y generación de token JWT (POST /login/)
+@app.post("/login/", response_model=schemas.Token)
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
 # Crear encuesta (POST /surveys/)
 @app.post("/surveys/", response_model=schemas.Survey)
