@@ -44,5 +44,6 @@ class Survey(Base):
     concentracion = Column(Integer)
     cansancio = Column(Integer)
     sexo = Column(Integer)
+    depresion = Column(Integer)
 
     user = relationship("User", back_populates="surveys")

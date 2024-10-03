@@ -22,8 +22,43 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-def create_survey(db: Session, survey: schemas.SurveyCreate, user_id: int):
-    db_survey = models.Survey(**survey.dict(), user_id=user_id)
+def create_survey(db: Session, survey: SurveyCreate, user_id: int):
+    # Sumar todos los campos para calcular el nivel de depresión
+    depresion_value = (
+        survey.tristeza + survey.pesimismo + survey.fracaso +
+        survey.perdida_placer + survey.culpa + survey.castigo +
+        survey.disconformidad + survey.autocritica + survey.suicidio +
+        survey.llanto + survey.agitacion + survey.interes +
+        survey.indeciso + survey.desvalorizacion + survey.energia +
+        survey.irritabilidad + survey.concentracion + survey.cansancio +
+        survey.sexo
+    )
+
+    # Crear el objeto de encuesta con el valor de depresión calculado
+    db_survey = Survey(
+        user_id=user_id,
+        tristeza=survey.tristeza,
+        pesimismo=survey.pesimismo,
+        fracaso=survey.fracaso,
+        perdida_placer=survey.perdida_placer,
+        culpa=survey.culpa,
+        castigo=survey.castigo,
+        disconformidad=survey.disconformidad,
+        autocritica=survey.autocritica,
+        suicidio=survey.suicidio,
+        llanto=survey.llanto,
+        agitacion=survey.agitacion,
+        interes=survey.interes,
+        indeciso=survey.indeciso,
+        desvalorizacion=survey.desvalorizacion,
+        energia=survey.energia,
+        irritabilidad=survey.irritabilidad,
+        concentracion=survey.concentracion,
+        cansancio=survey.cansancio,
+        sexo=survey.sexo,
+        depresion=depresion_value  # Asignar el valor calculado aquí
+    )
+
     db.add(db_survey)
     db.commit()
     db.refresh(db_survey)
