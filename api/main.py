@@ -1,13 +1,28 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from database import get_db
 import crud, models, schemas, auth
-from database import engine
+from auth import get_current_user 
+from database import engine, get_db
+from fastapi.middleware.cors import CORSMiddleware
+from datetime import timedelta
+
+# Definición del esquema de autenticación
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Origen de tu frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos HTTP (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Permitir todos los headers
+)
+
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -36,5 +51,7 @@ async def create_survey(survey: schemas.SurveyCreate, current_user: schemas.User
     return crud.create_survey(db=db, survey=survey, user_id=current_user.id)
 
 @app.get("/users/me/", response_model=schemas.User)
-async def read_users_me(current_user: schemas.User = Depends(auth.get_current_user)):
+async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
+
+
