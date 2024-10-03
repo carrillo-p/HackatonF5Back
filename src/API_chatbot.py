@@ -6,7 +6,9 @@ from chatbot import PsychologistChatbot  # Importar la clase desde chatbot.py
 app = FastAPI()
 
 # Crear una instancia del chatbot psicólogo
-chatbot = PsychologistChatbot()
+pdf_paths = ["resources/dsm-5.pdf", "resources/relajacion.pdf"]
+web_urls = ["https://www.psychologytoday.com/us/basics/depression"]
+chatbot = PsychologistChatbot(pdf_paths=pdf_paths)
 
 # Modelo Pydantic para validar el input del usuario
 class UserInput(BaseModel):
