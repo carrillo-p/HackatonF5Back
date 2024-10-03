@@ -52,6 +52,7 @@ class SurveyCreate(SurveyBase):
 class Survey(SurveyBase):
     id: int
     user_id: int
+    depresion: int  
 
     class Config:
         orm_mode = True
