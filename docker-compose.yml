@@ -1,5 +1,24 @@
 services:
-  streamlit:
+
+ mysql:  
+    image: mysql:8.0  
+    container_name: mysql-db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}             
+      MYSQL_USER: ${DB_USERNAME}                            
+    ports:
+      - "3306:3306" 
+    volumes:
+      - mysql_data:/var/lib/mysql  
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - mynetwork
+ 
+ streamlit:
     build:
       context: ./streamlit
       dockerfile: Dockerfile
@@ -12,22 +31,25 @@ services:
     networks:
       - mynetwork
 
-  api:
+ api:
     build:
-      context: ./src
+      context: ./api
       dockerfile: Dockerfile  # Ruta al Dockerfile dentro del contexto ./src
     container_name: fastapi-app
     restart: always
-    # env_file:
-      # - .env  # Ruta al archivo .env relativa al directorio donde se encuentra el docker-compose.yml
+    env_file:
+      - .env  # Ruta al archivo .env relativa al directorio donde se encuentra el docker-compose.yml
     ports:
       - "8000:8000"
-    # depends_on:
-      # - postgres
+    depends_on:
+      - mysql
     volumes:
       - ./logs:/app/logs
     networks:
       - mynetwork
+
+volumes:
+  mysql_data:  # Volumen para persistencia de datos
 
 networks:
   mynetwork:
