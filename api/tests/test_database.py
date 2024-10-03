@@ -3,6 +3,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 from sqlalchemy.orm import Session
 from database import get_db, SessionLocal
+from database import SQLALCHEMY_DATABASE_URL
+
 
 class TestDatabase(unittest.TestCase):
 
@@ -28,4 +30,8 @@ class TestDatabase(unittest.TestCase):
             f"{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:"
             f"{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
         )
-        self.assertEqual(expected_url, SQLALCHEMY_DATABAS
+        self.assertEqual(expected_url, SQLALCHEMY_DATABASE_URL)
+
+
+if __name__ == '__main__':
+    unittest.main()
