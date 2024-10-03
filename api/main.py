@@ -3,10 +3,20 @@ from sqlalchemy.orm import Session
 import crud, models, schemas, auth
 from database import engine, get_db
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from src.chatbot import PsychologistChatbot 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+pdf_paths = ["src/resources/dsm-5.pdf", "src/resources/relajacion.pdf"] # añadir /src si se van a ejecutar los tests
+web_urls = ["https://www.psychologytoday.com/us/basics/depression", "https://www.nimh.nih.gov/health/find-help", "https://www.who.int/es/news-room/fact-sheets/detail/depression", "https://www.mayoclinic.org/diseases-conditions/depression/symptoms-causes/syc-20356007", "https://www.ncbi.nlm.nih.gov/books/NBK513238/", "https://www.cdc.gov/mentalhealth/depression/index.htm"]
+chatbot = PsychologistChatbot(pdf_paths=pdf_paths)
+
+# Modelo Pydantic para validar el input del usuario
+class UserInput(BaseModel):
+    message: str
 
 # Configurar CORS
 app.add_middleware(
@@ -46,3 +56,20 @@ async def read_users_me(username: str, password: str, db: Session = Depends(get_
     if not usuario:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     return usuario
+
+@app.post("/chat/")
+async def chat(user_input: UserInput):
+    """
+    Endpoint que recibe un mensaje de un usuario y devuelve la respuesta del chatbot psicólogo AI.
+    """
+    try:
+        # Obtener la respuesta del chatbot
+        response = chatbot.get_response(user_input.message)
+        return {"response": response}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
