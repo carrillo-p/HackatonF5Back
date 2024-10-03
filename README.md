@@ -2,8 +2,7 @@
 Repo del backend del hackaton
 
 Estructua del .env para trabajar en local con Docker:
-
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5433/db_name 
+- DATABASE_URL=postgresql+asyncpg://user:password@localhost:5433/db_name 
 - DB_TYPE=postgresql+asyncpg 
 - DB_HOST=localhost 
 - DB_PORT=5433 
