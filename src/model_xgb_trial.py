@@ -5,6 +5,8 @@ import shap
 from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 df = pd.read_csv('data/encuestas.csv')
 
@@ -57,5 +59,17 @@ explainer = shap.Explainer(model_final)
 shap_values = explainer.shap_values(X_test)
 
 shap_importance = pd.DataFrame(shap_values, columns=X_test.columns)
-shap_importance_mean = shap_importance.abs().mean().sort_values(ascending=False)
-shap_importance_mean.to_csv('shap_importance.csv')
+shap_importance_mean = shap_importance.abs().mean().sort_values(ascending=False).reset_index()
+shap_importance_mean.columns = ['Feature', 'SHAP Value']
+
+shap_importance_mean.to_csv('src/data/shap_importance.csv')
+
+plt.figure(figsize=(10, 6))
+sns.barplot(data=shap_importance_mean, x='SHAP Value', y='Feature', palette='viridis')
+plt.title('Importancia de las Características (Valores SHAP)', fontsize=16)
+plt.xlabel('Valor SHAP Medio', fontsize=14)
+plt.ylabel('Características', fontsize=14)
+plt.grid(axis='x')
+plt.tight_layout()
+plt.savefig('src/data/shap_importance_plot.png')  # Guardar el gráfico
+plt.show()  # Mostrar el gráfico
