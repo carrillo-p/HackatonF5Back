@@ -23,7 +23,7 @@ class User(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SurveyBase(BaseModel):
     tristeza: int
@@ -55,7 +55,7 @@ class Survey(SurveyBase):
     depresion: int  
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str

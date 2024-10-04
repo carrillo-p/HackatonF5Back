@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 import models, schemas
 from auth import get_password_hash, verify_password
+from schemas import SurveyCreate
+from models import Survey
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -56,7 +58,7 @@ def create_survey(db: Session, survey: SurveyCreate, user_id: int):
         concentracion=survey.concentracion,
         cansancio=survey.cansancio,
         sexo=survey.sexo,
-        depresion=depresion_value  # Asignar el valor calculado aquí
+        depresion=depresion_value  
     )
 
     db.add(db_survey)
