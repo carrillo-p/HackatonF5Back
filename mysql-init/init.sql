@@ -1,4 +1,3 @@
--- Crear la base de datos
 CREATE DATABASE IF NOT EXISTS safe_soul;
 USE safe_soul;
 
@@ -41,7 +40,7 @@ CREATE TABLE surveys (
     concentracion INT,
     cansancio INT,
     sexo INT,
-    depresion INT,
+    depresion INT
 
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

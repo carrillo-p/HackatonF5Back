@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Cargar .env desde la carpeta raíz
-load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
+load_dotenv()
 
 
 DB_USERNAME = os.getenv("DB_USERNAME")

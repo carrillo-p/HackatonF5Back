@@ -1,24 +1,49 @@
 services:
-
- mysql:  
-    image: mysql:8.0  
+  mysql:
+    image: mysql:latest
     container_name: mysql-db
     restart: always
-    env_file:
-      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}             
-      MYSQL_USER: ${DB_USERNAME}                            
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306" 
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql  
+      - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - mynetwork
- 
- streamlit:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: fastapi-app
+    restart: always
+    environment:
+      DB_HOST: mysql-db
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: 3306
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - mynetwork
+
+  streamlit:
     build:
       context: ./streamlit
       dockerfile: Dockerfile
@@ -27,30 +52,13 @@ services:
     ports:
       - "8501:8501"
     depends_on:
-     - api 
+      - api
     networks:
       - mynetwork
-
- api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile  # Ruta al Dockerfile dentro del contexto ./src
-    container_name: fastapi-app
-    restart: always
-    env_file:
-      - .env  # Ruta al archivo .env relativa al directorio donde se encuentra el docker-compose.yml
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mysql
-    volumes:
-      - ./logs:/app/logs
-    networks:
-      - mynetwork
-
-volumes:
-  mysql_data:  # Volumen para persistencia de datos
 
 networks:
   mynetwork:
     driver: bridge
+
+volumes:
+  mysql_data:
