@@ -130,5 +130,4 @@ watchfiles==0.22.0
 websockets==12.0
 yarl==1.13.1
 zope-interface==6.4.post2
-python-jose==3.3.0
 passlib==1.7.4
